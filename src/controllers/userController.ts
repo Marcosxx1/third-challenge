@@ -138,6 +138,21 @@ class UserController {
       return res.status(500).json({ message: 'Error deleting user', error });
     }
   }
+
+  async getById(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      return res.status(200).json(user);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error getting user by id', error });
+    }
+  }
 }
 
 export default new UserController();
