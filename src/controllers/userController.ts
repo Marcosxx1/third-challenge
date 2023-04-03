@@ -153,6 +153,15 @@ class UserController {
       return res.status(500).json({ message: 'Error getting user by id', error });
     }
   }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const users = await User.find();
+      return res.status(200).json(users);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error getting all users', error });
+    }
+  }
 }
 
 export default new UserController();
