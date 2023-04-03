@@ -122,6 +122,22 @@ class UserController {
     }
   }
 
+  async delete(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const userExists = await User.findById(id);
+      if (!userExists) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      await userExists.deleteOne();
+
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(500).json({ message: 'Error deleting user', error });
+    }
+  }
 }
 
 export default new UserController();
