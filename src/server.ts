@@ -1,4 +1,5 @@
 import { app } from './app';
+import userRouter from './routes/userRoutes';
 
 process.on('uncaughtException', (err: Error) => {
   console.log('UNCAUGHT EXCEPTION! Shutting down...');
@@ -7,6 +8,8 @@ process.on('uncaughtException', (err: Error) => {
 });
 
 const port = process.env.PORT || 3000;
+
+app.use('/api/v1/users', userRouter);
 
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
