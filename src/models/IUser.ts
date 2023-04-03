@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import Joi from 'joi';
+import { cpf } from 'cpf-cnpj-validator';
 import axios from 'axios';
 
 interface IUser extends Document {
@@ -30,7 +31,7 @@ const UserSchema: Schema = new Schema<IUser>(
       unique: true,
       validate: {
         validator: (value: string) => {
-          return /^\d{3}\.\d{3}\.\d{3}\-\d{2}$/.test(value);
+          return cpf.isValid(value);
         },
         message: 'Invalid CPF',
       },
