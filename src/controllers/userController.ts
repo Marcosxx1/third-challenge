@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/IUser';
+import User from '../schemas/IUser';
 import axios from 'axios';
 import Joi from 'joi';
 
@@ -41,17 +41,17 @@ const createUserSchema = Joi.object<CreateUserRequest>({
   cep: Joi.string()
     .pattern(/^\d{5}-\d{3}$/)
     .required(),
-  patio: Joi.string().required(),
-  complement: Joi.string().required(),
-  neighborhood: Joi.string().required(),
-  locality: Joi.string().required(),
-  uf: Joi.string().required(),
   qualified: Joi.boolean().required(),
 });
 
 class UserController {
   async create(req: Request, res: Response) {
     try {
+      /*
+      //interface usuario
+      console.log('create user');
+      console.log(req.body); */
+
       const { error, value } = createUserSchema.validate(req.body, { abortEarly: false });
       if (error) {
         return res.status(400).json({ message: 'Invalid input', errors: error.details });
@@ -65,7 +65,9 @@ class UserController {
         return res.status(400).json({ message: `User with this ${field} already exists` });
       }
 
+      //utils
       const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`);
+      console.log(data);
       const { logradouro: patio, complemento: complement, bairro: neighborhood, localidade: locality, uf } = data;
 
       const user = await User.create({
@@ -96,6 +98,8 @@ class UserController {
       req.body;
 
     try {
+      /*       const userLeo = await userService.update(req);
+            return userLeo; */
       const userExists = await User.findById(id);
       if (!userExists) {
         return res.status(404).json({ message: 'User not found' });

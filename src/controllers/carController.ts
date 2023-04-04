@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
-import Vehicle, { IVehicle } from '../models/IVehicle';
+import Vehicle, { IVehicle } from '../schemas/IVehicle';
 
 const carSchema = Joi.object({
   model: Joi.string().required(),

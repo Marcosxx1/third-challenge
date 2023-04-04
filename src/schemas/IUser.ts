@@ -55,7 +55,8 @@ const UserSchema: Schema = new Schema<IUser>(
       trim: true,
       validate: {
         validator: (value: string) => {
-          return Joi.string().email().validate(value).error === null;
+          const result = Joi.string().email().validate(value);
+          return result.error === undefined;
         },
         message: 'Invalid email',
       },
