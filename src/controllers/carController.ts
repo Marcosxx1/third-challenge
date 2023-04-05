@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
-import Vehicle, { IVehicle } from '../schemas/IVehicle';
+import Car, { ICar } from '../schemas/ICar';
 
 const carSchema = Joi.object({
   model: Joi.string().required(),
@@ -31,7 +31,7 @@ class CarController {
       if (error) {
         res.status(400).json({ message: error.details.map((e) => e.message) });
       } else {
-        const car = await Vehicle.create(value);
+        const car = await Car.create(value);
         res.status(201).json(car);
       }
     } catch (error) {
@@ -43,8 +43,8 @@ class CarController {
     try {
       const { limit = 10, offset = 0, offsets = 10, ...filters } = req.query;
       const query = filters;
-      const cars = await Vehicle.find(query).skip(Number(offset)).limit(Number(limit));
-      const total = await Vehicle.countDocuments(query);
+      const cars = await Car.find(query).skip(Number(offset)).limit(Number(limit));
+      const total = await Car.countDocuments(query);
       res.status(200).json({ cars, total, limit, offset, offsets });
     } catch (error) {
       console.error(error);
@@ -55,7 +55,7 @@ class CarController {
   getCarById = async (req: Request, res: Response) => {
     try {
       const { id } = await idSchema.validateAsync(req.params);
-      const car = await Vehicle.findById(id);
+      const car = await Car.findById(id);
       if (!car) {
         res.status(404).json({ message: 'Car not found' });
       } else {
@@ -75,7 +75,7 @@ class CarController {
       if (error) {
         res.status(400).json({ message: error.details.map((e) => e.message) });
       } else {
-        const car = await Vehicle.findByIdAndUpdate(id, value, { new: true });
+        const car = await Car.findByIdAndUpdate(id, value, { new: true });
         if (!car) {
           res.status(404).json({ message: 'Car not found' });
         } else {
@@ -96,7 +96,7 @@ class CarController {
 
       const { id } = await schema.validateAsync(req.params);
 
-      const deletedCar: IVehicle | null = await Vehicle.findByIdAndDelete(id);
+      const deletedCar: ICar | null = await Car.findByIdAndDelete(id);
 
       if (!deletedCar) {
         res.status(404).send({ message: 'Car not found' });

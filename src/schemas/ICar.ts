@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IVehicle extends Document {
+export interface ICar extends Document {
   model: string;
   color: string;
   year: number;
@@ -11,7 +11,7 @@ export interface IVehicle extends Document {
   number_of_passengers: number;
 }
 
-const VehicleSchema: Schema = new Schema<IVehicle>({
+const VehicleSchema: Schema = new Schema<ICar>({
   model: {
     type: String,
     required: [true, 'model is required'],
@@ -55,4 +55,4 @@ VehicleSchema.path('accessories').validate((accessories: { description: string }
   return accessories.length > 0;
 }, 'at least one accessory is required');
 
-export default mongoose.model<IVehicle>('Vehicle', VehicleSchema);
+export default mongoose.model<ICar>('Vehicle', VehicleSchema);

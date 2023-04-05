@@ -2,7 +2,7 @@ import { app } from './app';
 import mongoose, { ConnectOptions } from 'mongoose';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: './config.env' });
+dotenv.config({ path: '../config.env' });
 
 const DB = process.env.DATABASE!;
 
