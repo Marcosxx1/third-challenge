@@ -8,7 +8,8 @@ export const app = express();
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-app.use('/api/v1', userRouter, carRouter);
+app.use('/api/v1', userRouter);
+app.use('/api/v1', carRouter);
 //app.use('/api/v1');
 
 app.use(json());
