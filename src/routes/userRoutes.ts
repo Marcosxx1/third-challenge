@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import UserController from '../controllers/userController';
-import authService from '../services/AuthService';
+import UserController from '../api/controllers/userController';
+//import authService from '../services/AuthService';
 
 const userRouter = Router();
 
@@ -11,7 +11,7 @@ userRouter.delete('/users/:id', UserController.delete);
 userRouter.get('/users/:id', UserController.getById);
 userRouter.get('/users', UserController.getAll);
 
-userRouter.post('/authenticate', async (req, res) => {
+/* userRouter.post('/authenticate', async (req, res) => {
   try {
     const authResult = await authService.authenticate(req);
     res.json(authResult);
@@ -19,5 +19,5 @@ userRouter.post('/authenticate', async (req, res) => {
     res.status(401).json({ message: error.message });
   }
 });
-
+ */
 export default userRouter;

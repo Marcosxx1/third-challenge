@@ -1,7 +1,7 @@
 import userService from '../services/userService';
 import { Request, Response } from 'express';
 import User from '../schemas/IUser';
-import handleErrorResponse from '../helpers/errorHandler';
+import handleErrorResponse from '../../helpers/errorHandler';
 
 class UserController {
   async create(req: Request, res: Response) {

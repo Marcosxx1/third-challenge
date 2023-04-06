@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import CarServices from '../services/carServices';
-import handleErrorResponse from '../helpers/errorHandler';
+import handleErrorResponse from '../../helpers/errorHandler';
 
 class CarController {
   async createCar(req: Request, res: Response): Promise<void> {
