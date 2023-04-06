@@ -18,7 +18,7 @@ interface IUser extends Document {
   uf: string;
 }
 
-const UserSchema: Schema = new Schema<IUser>(
+const UserSchema: Schema<IUser> = new Schema<IUser>(
   {
     name: {
       type: String,

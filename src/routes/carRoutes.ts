@@ -3,11 +3,11 @@ import CarController from '../controllers/carController';
 
 const carRouter = Router();
 
-carRouter.post('/cars', CarController.createCar);
+carRouter.post('/car', CarController.createCar);
 
-carRouter.put('/cars/:id', CarController.updateCarById);
-carRouter.delete('/cars/:id', CarController.removeCarById);
-carRouter.get('/cars/:id', CarController.getCarById);
-carRouter.get('/cars', CarController.getCars);
+carRouter.put('/car/:id', CarController.updateCarById);
+carRouter.delete('/car/:id', CarController.removeCarById);
+carRouter.get('/car/:id', CarController.getCarById);
+carRouter.get('/car', CarController.getCars);
 
 export default carRouter;
