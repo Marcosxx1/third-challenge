@@ -1,7 +1,8 @@
 import User, { IUser } from '../schemas/IUser';
 import axios from 'axios';
-import Joi, { ValidationResult } from 'joi';
-
+import Joi from 'joi';
+//import Joi, { ValidationResult } from 'joi';
+//Lembrar do ValidationResult
 interface CreateUserInput {
   name: string;
   cpf: string;
