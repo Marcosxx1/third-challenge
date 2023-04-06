@@ -1,5 +1,6 @@
 import User, { IUser } from '../schemas/IUser';
 import axios from 'axios';
+import { NextFunction } from 'express';
 import Joi from 'joi';
 //import Joi, { ValidationResult } from 'joi';
 //Lembrar do ValidationResult
