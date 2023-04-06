@@ -1,113 +1,67 @@
 import { Request, Response } from 'express';
-import Joi from 'joi';
-import Car, { ICar } from '../schemas/ICar';
+import CarServices from '../services/carServices';
+import handleErrorResponse from '../helpers/errorHandler';
 
-const carSchema = Joi.object({
-  model: Joi.string().required(),
-  color: Joi.string().required(),
-  year: Joi.number().integer().min(1950).max(2023).required(),
-  value_per_day: Joi.number().integer().min(1).required(),
-  accessories: Joi.array()
-    .items(
-      Joi.object({
-        description: Joi.string().required(),
-      }),
-    )
-    .unique((a, b) => a.description === b.description)
-    .min(1)
-    .required(),
-  number_of_passengers: Joi.number().integer().min(1).required(),
-});
-
-const idSchema = Joi.object({
-  id: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .required(),
-});
 class CarController {
-  async createCar(req: Request, res: Response) {
+  async createCar(req: Request, res: Response): Promise<void> {
     try {
-      const { value, error } = carSchema.validate(req.body, { abortEarly: false });
-      if (error) {
-        res.status(400).json({ message: error.details.map((e) => e.message) });
-      } else {
-        const car = await Car.create(value);
-        res.status(201).json(car);
-      }
+      const carData = req.body;
+      const car = await CarServices.createCar(carData);
+      res.json(car);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
-    }
-  }
-  async getCars(req: Request, res: Response) {
-    try {
-      const { limit = 10, offset = 0, offsets = 10, ...filters } = req.query;
-      const query = filters;
-      const cars = await Car.find(query).skip(Number(offset)).limit(Number(limit));
-      const total = await Car.countDocuments(query);
-      res.status(200).json({ cars, total, limit, offset, offsets });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
+      handleErrorResponse(res, error);
     }
   }
 
-  getCarById = async (req: Request, res: Response) => {
+  async getCars(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = await idSchema.validateAsync(req.params);
-      const car = await Car.findById(id);
-      if (!car) {
-        res.status(404).json({ message: 'Car not found' });
+      const { limit, offset, filters } = req.query;
+      const cars = await CarServices.getCars(Number(limit), Number(offset), filters);
+      res.json(cars);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  }
+
+  async getCarById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      console.log('here', id);
+      const car = await CarServices.getCarById(id);
+      if (car) {
+        res.json(car);
       } else {
-        res.status(200).json(car);
+        handleErrorResponse(res, { message: 'Car not found' }, 404);
       }
     } catch (error) {
-      console.error(error);
-      res.status(400).json({ message: 'Invalid ID' });
+      handleErrorResponse(res, error);
     }
-  };
+  }
 
-  updateCarById = async (req: Request, res: Response) => {
+  async updateCarById(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = await idSchema.validateAsync(req.params);
-      const { value, error } = carSchema.validate(req.body, { abortEarly: false });
-
-      if (error) {
-        res.status(400).json({ message: error.details.map((e) => e.message) });
+      const { id } = req.params;
+      const carData = req.body;
+      const car = await CarServices.updateCarById(id, carData);
+      if (car) {
+        res.json(car);
       } else {
-        const car = await Car.findByIdAndUpdate(id, value, { new: true });
-        if (!car) {
-          res.status(404).json({ message: 'Car not found' });
-        } else {
-          res.status(200).json(car);
-        }
+        handleErrorResponse(res, { message: 'Car not found' }, 404);
       }
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
+      handleErrorResponse(res, error);
     }
-  };
+  }
 
-  removeCarById = async (req: Request, res: Response) => {
+  async removeCarById(req: Request, res: Response): Promise<void> {
     try {
-      const schema = Joi.object({
-        id: Joi.string().required(),
-      });
-
-      const { id } = await schema.validateAsync(req.params);
-
-      const deletedCar: ICar | null = await Car.findByIdAndDelete(id);
-
-      if (!deletedCar) {
-        res.status(404).send({ message: 'Car not found' });
-        return;
-      }
-
+      const { id } = req.params;
+      await CarServices.removeCarById(id);
       res.status(204).send();
-    } catch (error: any) {
-      console.error(error);
-      res.status(400).send({ message: error.message });
+    } catch (error) {
+      handleErrorResponse(res, error);
     }
-  };
+  }
 }
+
 export default new CarController();
