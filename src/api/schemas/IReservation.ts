@@ -10,6 +10,22 @@ interface IReservation extends Document {
   final_value: number;
 }
 
+interface PaginationOptions {
+  page: number;
+  limit: number;
+}
+
+interface IReservationModel extends Model<IReservation> {
+  paginate(
+    query: any,
+    options: PaginationOptions,
+  ): Promise<{
+    totalDocs: number;
+    totalPages: number;
+    queryResults: IReservation[];
+  }>;
+}
+
 const ReservationSchema: Schema<IReservation> = new Schema<IReservation>(
   {
     id_user: {
@@ -36,7 +52,26 @@ const ReservationSchema: Schema<IReservation> = new Schema<IReservation>(
   { timestamps: true },
 );
 
-// Validate user has a driver's license
+ReservationSchema.statics.paginate = async function (
+  query: any,
+  options: PaginationOptions,
+): Promise<{
+  totalDocs: number;
+  totalPages: number;
+  queryResults: IReservation[];
+}> {
+  const { page, limit } = options;
+  const startIndex = (page - 1) * limit;
+
+  const totalDocs = await this.countDocuments(query);
+
+  const queryResults = await this.find(query).skip(startIndex).limit(limit);
+
+  const totalPages = Math.ceil(totalDocs / limit);
+
+  return { totalDocs, totalPages, queryResults };
+};
+
 ReservationSchema.pre<IReservation>('save', async function (next) {
   try {
     const User: Model<IUser> = mongoose.model('User');
@@ -50,7 +85,6 @@ ReservationSchema.pre<IReservation>('save', async function (next) {
   }
 });
 
-// Prevent multiple reservations for the same car in the same day
 ReservationSchema.pre<IReservation>('save', async function (next) {
   try {
     const Reservation: Model<IReservation> = mongoose.model('Reservation');
@@ -68,7 +102,6 @@ ReservationSchema.pre<IReservation>('save', async function (next) {
   }
 });
 
-// Prevent multiple reservations in the same period by the same user
 ReservationSchema.pre<IReservation>('save', async function (next) {
   try {
     const Reservation: Model<IReservation> = mongoose.model('Reservation');
@@ -86,7 +119,6 @@ ReservationSchema.pre<IReservation>('save', async function (next) {
   }
 });
 
-// Calculate final_value based on value_per_day
 ReservationSchema.pre<IReservation>('save', async function (next) {
   try {
     const Car = mongoose.model<ICar>('Car');
@@ -102,4 +134,6 @@ ReservationSchema.pre<IReservation>('save', async function (next) {
   }
 });
 
-export default mongoose.model<IReservation>('Reservation', ReservationSchema);
+const Reservation: IReservationModel = mongoose.model<IReservation, IReservationModel>('Reservation', ReservationSchema);
+
+export default Reservation;
