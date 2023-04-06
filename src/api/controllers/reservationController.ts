@@ -3,6 +3,23 @@ import { Request, Response } from 'express';
 import handleErrorResponse from '../../helpers/errorHandler';
 
 class ReservationController {
+  async createReservation(req: Request, res: Response): Promise<void> {
+    try {
+      const { id_user, start_date, end_date, id_car, final_value } = req.body;
+      const reservationData = {
+        id_user,
+        start_date: new Date(start_date),
+        end_date: new Date(end_date),
+        id_car,
+        final_value: Number(final_value),
+      };
+      const createdReservation = await ReservationService.createReservation(reservationData);
+      res.json(createdReservation);
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  }
+
   async getReservations(req: Request, res: Response): Promise<void> {
     try {
       const { id_user, start_date, end_date, id_car, final_value, page, limit } = req.query;

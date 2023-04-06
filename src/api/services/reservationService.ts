@@ -4,6 +4,18 @@ import Reservation, { IReservationModel } from '../schemas/IReservation';
 import moment from 'moment';
 
 class ReservationService {
+  async createReservation(reservationData: {
+    id_user: string;
+    start_date: Date;
+    end_date: Date;
+    id_car: string;
+    final_value: number;
+  }): Promise<IReservation> {
+    const reservation = new Reservation(reservationData);
+    await reservation.save();
+    return reservation;
+  }
+
   async getReservations(
     id_user: string,
     start_date: Date,
@@ -18,6 +30,7 @@ class ReservationService {
     queryResults: IReservation[];
   }> {
     const query: any = {};
+    console.log('here ', id_user);
 
     if (id_user) {
       query.id_user = id_user;
