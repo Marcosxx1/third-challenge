@@ -1,64 +1,83 @@
-import Joi from 'joi';
-import Car, { ICar } from '../schemas/ICar';
+import Car, { ICar, IAccessory } from '../schemas/ICar';
 
-const carSchema = Joi.object({
-  model: Joi.string().required(),
-  color: Joi.string().required(),
-  year: Joi.number().integer().min(1950).max(2023).required(),
-  value_per_day: Joi.number().integer().min(1).required(),
-  accessories: Joi.array()
-    .items(
-      Joi.object({
-        description: Joi.string().required(),
-      }),
-    )
-    .unique((a, b) => a.description === b.description)
-    .min(1)
-    .required(),
-  number_of_passengers: Joi.number().integer().min(1).required(),
-});
+export const createCar = async (carData: {
+  model: string;
+  color: string;
+  year: number;
+  value_per_day: number;
+  accessories: IAccessory[];
+  number_of_passengers: number;
+}): Promise<ICar> => {
+  const { model, color, year, value_per_day, accessories, number_of_passengers } = carData;
 
-const idSchema = Joi.object({
-  id: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .required(),
-});
+  const car = new Car({
+    model,
+    color,
+    year,
+    value_per_day,
+    accessories,
+    number_of_passengers,
+  });
 
-class CarServices {
-  async createCar(carData: ICar): Promise<ICar> {
-    const { value } = carSchema.validate(carData, { abortEarly: false });
-    const car = await Car.create(value);
-    return car;
-  }
+  await car.save();
+  return car;
+};
 
-  async getCars(
-    limit: number,
-    offset: number,
-    filters: any,
-  ): Promise<{ cars: ICar[]; total: number; limit: number; offset: number; offsets: number }> {
-    const query = filters;
-    const cars = await Car.find(query).skip(Number(offset)).limit(Number(limit));
-    const total = await Car.countDocuments(query);
-    return { cars, total, limit, offset, offsets: 10 };
-  }
+export const listCars = async (
+  limit: number,
+  offset: number,
+  queryParams: { model?: string; color?: string; year?: number; value_per_day?: number; accessories?: string[] },
+): Promise<{ cars: ICar[]; total: number; limit: number; offset: number }> => {
+  const { model, color, year, value_per_day, accessories } = queryParams;
 
-  async getCarById(id: string): Promise<ICar | null> {
-    const { id: carId } = await idSchema.validateAsync({ id });
-    const car = await Car.findById(carId);
-    return car;
-  }
+  const query: any = {};
+  if (model) query.model = model;
+  if (color) query.color = color;
+  if (year) query.year = year;
+  if (value_per_day) query.value_per_day = value_per_day;
+  if (accessories) query.accessories = { $in: accessories };
 
-  async updateCarById(id: string, carData: ICar): Promise<ICar | null> {
-    const { id: carId } = await idSchema.validateAsync({ id });
-    const { value } = carSchema.validate(carData, { abortEarly: false });
-    const car = await Car.findByIdAndUpdate(carId, value, { new: true });
-    return car;
-  }
+  const total = await Car.countDocuments(query);
 
-  async removeCarById(id: string): Promise<void> {
-    const { id: carId } = await idSchema.validateAsync({ id });
-    await Car.findByIdAndRemove(carId);
-  }
-}
+  const cars = await Car.find(query).skip(offset).limit(limit).exec();
 
-export default new CarServices();
+  return { cars, total, limit, offset };
+};
+
+export const removeCar = async (id: string): Promise<void> => {
+  await Car.findByIdAndRemove(id);
+};
+
+export const updateCar = async (
+  id: string,
+  carData: {
+    model?: string;
+    color?: string;
+    year?: number;
+    value_per_day?: number;
+    accessories?: IAccessory[];
+    number_of_passengers?: number;
+  },
+): Promise<ICar | null> => {
+  const { model, color, year, value_per_day, accessories, number_of_passengers } = carData;
+
+  const car = await Car.findByIdAndUpdate(
+    id,
+    {
+      model,
+      color,
+      year,
+      value_per_day,
+      accessories,
+      number_of_passengers,
+    },
+    { new: true },
+  );
+
+  return car;
+};
+
+export const getCarById = async (id: string): Promise<ICar | null> => {
+  const car = await Car.findById(id);
+  return car;
+};

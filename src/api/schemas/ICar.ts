@@ -5,12 +5,14 @@ export interface ICar extends Document {
   color: string;
   year: number;
   value_per_day: number;
-  accessories: {
-    description: string;
-  }[];
+  accessories: IAccessory[];
   number_of_passengers: number;
+  limit?: number;
+  offset?: number;
 }
-
+export interface IAccessory {
+  description: string;
+}
 const VehicleSchema: Schema = new Schema<ICar>({
   model: {
     type: String,
@@ -43,6 +45,12 @@ const VehicleSchema: Schema = new Schema<ICar>({
     type: Number,
     required: [true, 'number_of_passengers is required'],
     min: [1, 'number_of_passengers cannot be less than 1'],
+  },
+  limit: {
+    type: Number,
+  },
+  offset: {
+    type: Number,
   },
 });
 

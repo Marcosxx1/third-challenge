@@ -76,7 +76,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
         message: 'Invalid CEP',
       },
     },
-    qualified: {
+    qualified: { // is the driver's lisence
       type: Boolean,
       required: true,
       default: false,

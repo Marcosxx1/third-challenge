@@ -1,67 +1,67 @@
 import { Request, Response } from 'express';
-import CarServices from '../services/carServices';
+import { createCar, listCars, removeCar, updateCar, getCarById } from '../services/carServices';
 import handleErrorResponse from '../../helpers/errorHandler';
 
-class CarController {
-  async createCar(req: Request, res: Response): Promise<void> {
-    try {
-      const carData = req.body;
-      const car = await CarServices.createCar(carData);
-      res.json(car);
-    } catch (error) {
-      handleErrorResponse(res, error);
-    }
+export const createCarController = async (req: Request, res: Response) => {
+  try {
+    const carData = req.body;
+    const car = await createCar(carData);
+    res.status(201).json(car);
+  } catch (error) {
+    handleErrorResponse(res, error);
   }
+};
 
-  async getCars(req: Request, res: Response): Promise<void> {
-    try {
-      const { limit, offset, filters } = req.query;
-      const cars = await CarServices.getCars(Number(limit), Number(offset), filters);
-      res.json(cars);
-    } catch (error) {
-      handleErrorResponse(res, error);
+export const listCarsController = async (req: Request, res: Response) => {
+  try {
+    const { limit, offset, queryParams } = req.query;
+    let parsedQueryParams: {
+      model?: string;
+      color?: string;
+      year?: number;
+      value_per_day?: number;
+      accessories?: string[];
+    } = {};
+
+    if (typeof queryParams === 'string') {
+      parsedQueryParams = JSON.parse(queryParams);
+    } else if (Array.isArray(queryParams)) {
     }
-  }
 
-  async getCarById(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      console.log('here', id);
-      const car = await CarServices.getCarById(id);
-      if (car) {
-        res.json(car);
-      } else {
-        handleErrorResponse(res, { message: 'Car not found' }, 404);
-      }
-    } catch (error) {
-      handleErrorResponse(res, error);
-    }
+    const cars = await listCars(Number(limit), Number(offset), parsedQueryParams);
+    res.json(cars);
+  } catch (error) {
+    handleErrorResponse(res, error);
   }
+};
 
-  async updateCarById(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const carData = req.body;
-      const car = await CarServices.updateCarById(id, carData);
-      if (car) {
-        res.json(car);
-      } else {
-        handleErrorResponse(res, { message: 'Car not found' }, 404);
-      }
-    } catch (error) {
-      handleErrorResponse(res, error);
-    }
+export const removeCarController = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    await removeCar(id);
+    res.sendStatus(204);
+  } catch (error) {
+    handleErrorResponse(res, error);
   }
+};
 
-  async removeCarById(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      await CarServices.removeCarById(id);
-      res.status(204).send();
-    } catch (error) {
-      handleErrorResponse(res, error);
-    }
+export const updateCarController = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const carData = req.body;
+    const car = await updateCar(id, carData);
+    res.json(car);
+  } catch (error) {
+    handleErrorResponse(res, error);
   }
-}
+};
 
-export default new CarController();
+export const getCarByIdController = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const car = await getCarById(id);
+    res.json(car);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
