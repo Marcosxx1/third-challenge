@@ -1,6 +1,10 @@
 import { Response } from 'express';
 
-const handleErrorResponse = (res: Response, error: any, status = 500) => {
+const handleErrorResponse = (
+  res: Response<any, Record<string, any>>,
+  error: any,
+  status = 500,
+): Response<any, Record<string, any>> => {
   const { message, details } = error;
 
   console.error(error);
