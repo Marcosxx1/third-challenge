@@ -1,23 +1,32 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import UserController from '../api/controllers/userController';
-//import authService from '../services/AuthService';
+import AuthService from '../api/services/authService';
+import handleErrorResponse from '../helpers/errorHandler';
 
 const userRouter = Router();
 
-userRouter.post('/users', UserController.create);
+const authService = new AuthService();
 
+userRouter.post('/authenticate', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const token = await authService.generateJwtToken(email);
+    console.log('email: ', email, 'password: ', password, 'token: ', token);
+    if (token) {
+      res.json({ token });
+    } else {
+      handleErrorResponse(res, { message: 'Invalid email or password' }, 401);
+    }
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+});
+
+userRouter.post('/users', UserController.create);
 userRouter.put('/users/:id', UserController.update);
 userRouter.delete('/users/:id', UserController.delete);
 userRouter.get('/users/:id', UserController.getById);
 userRouter.get('/users', UserController.getAll);
 
-/* userRouter.post('/authenticate', async (req, res) => {
-  try {
-    const authResult = await authService.authenticate(req);
-    res.json(authResult);
-  } catch (error: any) {
-    res.status(401).json({ message: error.message });
-  }
-});
- */
 export default userRouter;

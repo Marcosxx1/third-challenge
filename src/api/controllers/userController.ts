@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
-import User from '../schemas/IUser';
+import User, { IUser } from '../schemas/IUser'; // Import the IUser interface
 import handleErrorResponse from '../../helpers/errorHandler';
 import UserService from '../services/userService';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'; // Import the necessary libraries for authentication
+
 const userService = new UserService();
+
 class UserController {
   async create(req: Request, res: Response) {
     try {
@@ -82,6 +86,29 @@ class UserController {
     try {
       const users = await User.find();
       return res.status(200).json(users);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  async authenticate(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return res.status(401).json({ error: 'Authentication failed. User not found.' });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Authentication failed. Invalid password.' });
+      }
+
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY ?? 'defaultSecret', { expiresIn: '1h' });
+
+      return res.status(200).json({ user, token });
     } catch (error) {
       return handleErrorResponse(res, error);
     }
