@@ -1,8 +1,8 @@
-import userService from '../services/userService';
 import { Request, Response } from 'express';
 import User from '../schemas/IUser';
 import handleErrorResponse from '../../helpers/errorHandler';
-
+import UserService from '../services/userService';
+const userService = new UserService();
 class UserController {
   async create(req: Request, res: Response) {
     try {

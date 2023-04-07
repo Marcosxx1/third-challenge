@@ -7,8 +7,8 @@ export interface ICar extends Document {
   value_per_day: number;
   accessories: IAccessory[];
   number_of_passengers: number;
-  limit?: number;
-  offset?: number;
+  limit: number;
+  offset: number;
 }
 export interface IAccessory {
   description: string;

@@ -28,6 +28,7 @@ export const listCars = async (
     const total = await Car.countDocuments(query);
 
     const cars = await Car.find(query).skip(offset).limit(limit).exec();
+    console.log('carRepository  limit:', limit, 'offset: ', offset);
 
     return { cars, total, limit, offset };
   } catch (error) {

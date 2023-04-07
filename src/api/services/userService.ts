@@ -1,9 +1,8 @@
-import User, { IUser } from '../schemas/IUser';
-import axios from 'axios';
-import { NextFunction } from 'express';
 import Joi from 'joi';
-//import Joi, { ValidationResult } from 'joi';
-//Lembrar do ValidationResult
+import UserRepository from '../repositories/userRepository';
+import { IUser } from '../schemas/IUser';
+import axios from 'axios';
+
 interface CreateUserInput {
   name: string;
   cpf: string;
@@ -40,7 +39,7 @@ class UserService {
     }
     const { name, cpf, birth, email, password, cep, qualified } = value;
 
-    const userExists = await User.findOne({ $or: [{ cpf }, { email }] });
+    const userExists = await UserRepository.findOne({ $or: [{ cpf }, { email }] });
     if (userExists) {
       const field = userExists.cpf === cpf ? 'CPF' : 'email';
       throw { message: `User with this ${field} already exists` };
@@ -49,7 +48,7 @@ class UserService {
     const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`);
     const { logradouro: patio, complemento: complement, bairro: neighborhood, localidade: locality, uf } = data;
 
-    const user = await User.create({
+    const user = await UserRepository.create({
       name,
       cpf,
       birth,
@@ -71,7 +70,7 @@ class UserService {
     const { name, cpf, birth, email, password, cep, qualified, patio, complement, neighborhood, locality, uf } =
       userData;
 
-    const userExists = await User.findById(id);
+    const userExists = await UserRepository.findById(id);
     if (!userExists) {
       throw { message: 'User not found' };
     }
@@ -89,31 +88,31 @@ class UserService {
     userExists.locality = locality;
     userExists.uf = uf;
 
-    const updatedUser = await userExists.save();
+    const updatedUser = await UserRepository.update(id, userExists);
 
     return updatedUser;
   }
 
   async deleteUser(id: string): Promise<void> {
-    const userExists = await User.findById(id);
+    const userExists = await UserRepository.findById(id);
     if (!userExists) {
       throw { message: 'User not found' };
     }
-    await userExists.deleteOne();
+    await UserRepository.delete(id);
   }
 
   async getUserById(id: string): Promise<IUser> {
-    const user = await User.findById(id);
+    const user = await UserRepository.findById(id);
     if (!user) {
       throw { message: 'User not found' };
     }
     return user;
   }
 
-  async getAllUsers(): Promise<IUser[]> {
-    const users = await User.find();
+  async getAllUsers(): Promise<Array<IUser>> {
+    const users = await UserRepository.findAll();
     return users;
   }
 }
 
-export default new UserService();
+export default UserService;
