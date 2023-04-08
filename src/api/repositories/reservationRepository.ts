@@ -10,6 +10,7 @@ export default class ReservationRepository {
     const reservation: IReservation = new Reservation({ id_user, start_date, end_date, id_car });
     return await reservation.save();
   }
+
   static async getReservations(page = 1, limit = 10, query = {}) {
     const skip = (page - 1) * limit;
     const total = await Reservation.countDocuments(query);

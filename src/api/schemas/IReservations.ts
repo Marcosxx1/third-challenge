@@ -34,22 +34,24 @@ const Car: Model<ICar> = mongoose.model<ICar>('Vehicle');
 
 const User: Model<IUser> = mongoose.model<IUser>('User');
 
-ReservationSchema.pre<IReservation>('save', async function () {
-  const car = await Car.findById(this.id_car);
-  const days = Math.ceil((this.end_date.getTime() - this.start_date.getTime()) / (1000 * 60 * 60 * 24));
-  if (car && car.value_per_day) {
-    this.final_value = car.value_per_day * days;
-  } else {
-    throw new Error("Car or car's value_per_day not found");
+class CustomError extends Error {
+  status: number;
+  constructor(message: string, status = 500) {
+    super(message);
+    this.name = this.constructor.name;
+    this.status = status;
+    Error.captureStackTrace(this, this.constructor);
   }
-});
+}
 
 ReservationSchema.pre<IReservation>('save', async function () {
   const user = await User.findById(this.id_user);
-  if (!user.qualified) {
-    throw new Error("User must have a driver's license to make a reservation");
-  } else if (!user) {
-    throw new Error('User not found');
+  if (!user) {
+    const error = new CustomError('User not found', 400);
+    throw error;
+  } else if (!user.qualified) {
+    const error = new CustomError("User must have a driver's license to make a reservation", 400);
+    throw error;
   }
 });
 
@@ -61,7 +63,8 @@ ReservationSchema.pre<IReservation>('save', async function () {
     end_date: { $gt: this.start_date },
   });
   if (existingReservation) {
-    throw new Error('There is already a reservation for this car on the same day');
+    const error = new CustomError('There is already a reservation for this car on the same day', 400);
+    throw error;
   }
 });
 
@@ -73,7 +76,8 @@ ReservationSchema.pre<IReservation>('save', async function () {
     end_date: { $gt: this.start_date },
   });
   if (existingReservation) {
-    throw new Error('There is already a reservation for this user in the same period');
+    const error = new CustomError('There is already a reservation for this user in the same period', 400);
+    throw error;
   }
 });
 

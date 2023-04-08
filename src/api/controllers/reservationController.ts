@@ -13,7 +13,7 @@ export default class ReservationController {
     try {
       const { start_date, end_date, id_car } = req.body;
 
-      const id_user = '643097654dd974ea210af30b';
+      const id_user = '64316e21fd4a246645581e57';
 
       const reservation = await this.reservationService.createReservation(id_user, start_date, end_date, id_car);
       res.status(201).json({ reservation });
@@ -22,16 +22,26 @@ export default class ReservationController {
     }
   };
 
-  getReservations = async (req: Request, res: Response): Promise<void> => {
+  getReservationsController = async (req: Request, res: Response) => {
     try {
       const { page, limit, query } = req.query;
-      const reservations = await this.reservationService.getReservations(Number(page), Number(limit), query);
-      res.status(200).json({ reservations });
+      let parsedPage = Number(page);
+      let parsedLimit = Number(limit);
+
+      if (isNaN(parsedPage) || parsedPage < 1) {
+        parsedPage = 1;
+      }
+
+      if (isNaN(parsedLimit) || parsedLimit < 1) {
+        parsedLimit = 10;
+      }
+
+      const reservations = await this.reservationService.getReservations(parsedPage, parsedLimit, query);
+      res.status(200).json(reservations);
     } catch (error) {
       handleErrorResponse(res, error);
     }
   };
-
   getReservationById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;

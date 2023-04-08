@@ -14,10 +14,14 @@ export default class ReservationService {
   }
 
   async getReservations(page = 1, limit = 10, query = {}) {
-    const skip = (page - 1) * limit;
-    const total = await Reservation.countDocuments(query);
-    const reservations = await Reservation.find(query).skip(skip).limit(limit);
-    return { total, page, limit, reservations };
+    try {
+      const skip = (page - 1) * limit;
+      const total = await Reservation.countDocuments(query);
+      const reservations = await Reservation.find(query).skip(skip).limit(limit);
+      return { total, page, limit, reservations };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getReservationById(id: string) {
