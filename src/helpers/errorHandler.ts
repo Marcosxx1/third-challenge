@@ -3,7 +3,7 @@ import { Response } from 'express';
 const handleErrorResponse = (
   res: Response<any, Record<string, any>>,
   error: any,
-  status = 500,
+  status = 500, // Set default value to 500
 ): Response<any, Record<string, any>> => {
   const { message, details } = error;
 

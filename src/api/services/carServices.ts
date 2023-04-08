@@ -40,7 +40,6 @@ export const listCars = async (
   const total = await Car.countDocuments(query);
 
   const cars = await Car.find(query).skip(offset).limit(limit).exec();
-  console.log('carService  limit:', limit, 'offset: ', offset);
   return { cars, total, limit, offset };
 };
 
@@ -61,7 +60,32 @@ export const updateCar = async (
 ): Promise<ICar | null> => {
   const { model, color, year, value_per_day, accessories, number_of_passengers } = carData;
 
-  const car = await Car.findByIdAndUpdate(
+  if (!model || !color || !year || !value_per_day || !accessories || !number_of_passengers) {
+    throw new Error('All fields are required');
+  }
+
+  if (
+    model === null ||
+    model === undefined ||
+    color === null ||
+    color === undefined ||
+    year === null ||
+    year === undefined ||
+    value_per_day === null ||
+    value_per_day === undefined ||
+    accessories === null ||
+    accessories === undefined ||
+    number_of_passengers === null ||
+    number_of_passengers === undefined
+  ) {
+    throw new Error('All fields are required');
+  }
+  let car = await Car.findById(id);
+
+  if (!car) {
+    throw new Error('id not found');
+  }
+  car = await Car.findByIdAndUpdate(
     id,
     {
       model,
