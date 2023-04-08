@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import ReservationService from '../services/reservationService';
 import handleErrorResponse from '../../helpers/errorHandler';
 
@@ -9,49 +9,65 @@ export default class ReservationController {
     this.reservationService = new ReservationService();
   }
 
-  async createReservation(
-    id_user: string,
-    start_date: string,
-    end_date: string,
-    id_car: string,
-    res: Response,
-  ): Promise<any> {
+  createReservation = async (req: Request, res: Response): Promise<void> => {
     try {
-      return await this.reservationService.createReservation(id_user, start_date, end_date, id_car);
-    } catch (error) {
-      return handleErrorResponse(res, error, 500);
-    }
-  }
+      const { start_date, end_date, id_car } = req.body;
 
-  async getReservations(page = 1, limit = 10, query = {}, res: Response) {
-    try {
-      return await this.reservationService.getReservations(page, limit, query);
-    } catch (error) {
-      return handleErrorResponse(res, error, 500);
-    }
-  }
+      const id_user = '643097654dd974ea210af30b';
 
-  async getReservationById(id: string, res: Response) {
-    try {
-      return await this.reservationService.getReservationById(id);
+      const reservation = await this.reservationService.createReservation(id_user, start_date, end_date, id_car);
+      res.status(201).json({ reservation });
     } catch (error) {
-      return handleErrorResponse(res, error, 500);
+      handleErrorResponse(res, error);
     }
-  }
+  };
 
-  async updateReservationById(id: string, update: any, res: Response) {
+  getReservations = async (req: Request, res: Response): Promise<void> => {
     try {
-      return await this.reservationService.updateReservationById(id, update);
+      const { page, limit, query } = req.query;
+      const reservations = await this.reservationService.getReservations(Number(page), Number(limit), query);
+      res.status(200).json({ reservations });
     } catch (error) {
-      return handleErrorResponse(res, error, 500);
+      handleErrorResponse(res, error);
     }
-  }
+  };
 
-  async removeReservationById(id: string, res: Response) {
+  getReservationById = async (req: Request, res: Response): Promise<void> => {
     try {
-      return await this.reservationService.removeReservationById(id);
+      const { id } = req.params;
+      const reservation = await this.reservationService.getReservationById(id);
+      if (reservation) {
+        res.status(200).json({ reservation });
+      } else {
+        res.status(404).json({ error: 'Reservation not found' });
+      }
     } catch (error) {
-      return handleErrorResponse(res, error, 500);
+      handleErrorResponse(res, error);
     }
-  }
+  };
+
+  updateReservationById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const update = req.body;
+      const reservation = await this.reservationService.updateReservationById(id, update);
+      if (reservation) {
+        res.status(200).json({ reservation });
+      } else {
+        res.status(404).json({ error: 'Reservation not found' });
+      }
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  };
+
+  removeReservationById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      await this.reservationService.removeReservationById(id);
+      res.status(204).end();
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  };
 }

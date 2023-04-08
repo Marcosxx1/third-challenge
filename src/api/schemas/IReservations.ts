@@ -30,9 +30,11 @@ const ReservationSchema: Schema<IReservation> = new Schema<IReservation>({
   },
 });
 
-// Calculate the final value based on the value_per_day
+const Car: Model<ICar> = mongoose.model<ICar>('Vehicle');
+
+const User: Model<IUser> = mongoose.model<IUser>('User');
+
 ReservationSchema.pre<IReservation>('save', async function () {
-  const Car = mongoose.model('Car');
   const car = await Car.findById(this.id_car);
   const days = Math.ceil((this.end_date.getTime() - this.start_date.getTime()) / (1000 * 60 * 60 * 24));
   if (car && car.value_per_day) {
@@ -43,11 +45,10 @@ ReservationSchema.pre<IReservation>('save', async function () {
 });
 
 ReservationSchema.pre<IReservation>('save', async function () {
-  const User: Model<IUser> = mongoose.model('User');
   const user = await User.findById(this.id_user);
-  if (user && !user.qualified) {
+  if (!user.qualified) {
     throw new Error("User must have a driver's license to make a reservation");
-  } else {
+  } else if (!user) {
     throw new Error('User not found');
   }
 });

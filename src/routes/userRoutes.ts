@@ -9,9 +9,9 @@ const authService = new AuthService();
 
 userRouter.post('/authenticate', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, userId } = req.body;
 
-    const token = await authService.generateJwtToken(email);
+    const token = await authService.generateJwtToken(email, userId);
     //console.log('email: ', email, 'password: ', password, 'token: ', token);
     if (token) {
       res.json({ token });

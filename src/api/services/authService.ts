@@ -1,5 +1,16 @@
 import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 import UserRepository from '../repositories/userRepository';
+import handleErrorResponse from '../../helpers/errorHandler';
+
+declare module 'express' {
+  interface Request {
+    user?: {
+      email: string;
+      userId: number;
+    };
+  }
+}
 
 class AuthService {
   private userRepository: typeof UserRepository;
@@ -10,19 +21,36 @@ class AuthService {
     this.JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'senhapadrao';
   }
 
-  generateJwtToken(email: string): string {
-    const payload = { email };
+  generateJwtToken(email: string, userId: number): string {
+    const payload = { email, userId };
     const token = jwt.sign(payload, this.JWT_SECRET_KEY, { expiresIn: '1h' });
     return token;
   }
 
-  validateJwtToken(token: string): object | null {
+  validateJwtToken(token: string): { email: string; userId: number } | null {
     try {
-      const payload = jwt.verify(token, this.JWT_SECRET_KEY);
-      return payload as object;
+      const payload = jwt.verify(token, this.JWT_SECRET_KEY) as { email: string; userId: number };
+      return payload;
     } catch (error) {
       return null;
     }
+  }
+
+  authenticate(req: Request, res: Response, next: NextFunction): void {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      handleErrorResponse(res, { message: 'Unauthorized' }, 401);
+      return;
+    }
+
+    const payload = this.validateJwtToken(token);
+    if (!payload) {
+      handleErrorResponse(res, { message: 'Invalid token' }, 401);
+      return;
+    }
+
+    res.locals.user = payload; // Store the payload object in res.locals.user
+    next();
   }
 }
 

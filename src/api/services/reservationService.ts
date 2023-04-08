@@ -8,7 +8,9 @@ export default class ReservationService {
     id_car: string,
   ): Promise<IReservation> {
     const reservation: IReservation = new Reservation({ id_user, start_date, end_date, id_car });
-    return await reservation.save();
+    reservation.final_value = 0;
+    await reservation.save();
+    return reservation;
   }
 
   async getReservations(page = 1, limit = 10, query = {}) {
