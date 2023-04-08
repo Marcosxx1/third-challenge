@@ -1,6 +1,8 @@
 import { app } from './app';
 import mongoose, { ConnectOptions } from 'mongoose';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json';
 
 dotenv.config({ path: '../config.env' });
 
@@ -12,6 +14,7 @@ try {
   });
 
   const port = process.env.PORT || 3000;
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   const server = app.listen(port, () => {
     console.log(`App running on port ${port}...`);
