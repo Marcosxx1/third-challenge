@@ -5,7 +5,7 @@ import {
   removeCarController,
   updateCarController,
   getCarByIdController,
-} from '../api/controllers/carController';
+} from '../controllers/carController';
 import validateID from '../helpers/validateID';
 
 const carRouter = Router();

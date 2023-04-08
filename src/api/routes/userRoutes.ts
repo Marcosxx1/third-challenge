@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
-import UserController from '../api/controllers/userController';
+import UserController from '../controllers/userController';
 import { validateID } from '../helpers/validateID';
-import AuthController from '../api/controllers/authController';
+import AuthController from '../controllers/authController';
 
 const userRouter = Router();
 

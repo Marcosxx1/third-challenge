@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 import { createCar, listCars, removeCar, updateCar, getCarById } from '../services/carServices';
-import handleErrorResponse from '../../helpers/errorHandler';
+import handleErrorResponse from '../helpers/errorHandler';
 
 export const createCarController = async (req: Request, res: Response) => {
   try {

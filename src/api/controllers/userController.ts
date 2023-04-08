@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import handleErrorResponse from '../../helpers/errorHandler';
+import handleErrorResponse from '../helpers/errorHandler';
 import UserService from '../services/userService';
 
 const userService = new UserService();

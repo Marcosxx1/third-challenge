@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../schemas/IUser';
 
+interface CustomRequest extends Request {
+  email?: string;
+}
 export default class AuthController {
-  authenticate = async (req: Request, res: Response) => {
+  authenticate = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
     try {
@@ -34,14 +37,26 @@ export default class AuthController {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
     }
+    next();
   };
 
-  protect = async (req: Request, res: Response, next: NextFunction) => {
+  passToken = async (req: CustomRequest, res: Response, next: NextFunction) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
-    console.log(token);
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET ?? '');
+        if (typeof decoded === 'object' && 'email' in decoded) {
+          req.body.email = (decoded as JwtPayload).email;
+        }
+      } catch (error) {
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+    } else {
+      return res.status(401).json({ error: 'Token not found' });
+    }
     next();
   };
 }

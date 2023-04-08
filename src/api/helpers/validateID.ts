@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
-import CarModel from '../api/schemas/ICar';
-import UserModel from '../api/schemas/IUser';
-import ReservationModel from '../api/schemas/IReservations';
+import CarModel from '../schemas/ICar';
+import UserModel from '../schemas/IUser';
+import ReservationModel from '../schemas/IReservations';
 
 export const validateID = (schemaName: string) => async (req: Request, res: Response, next: NextFunction) => {
   const id = req.params.id;

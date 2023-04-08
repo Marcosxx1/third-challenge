@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import UserRepository from '../repositories/userRepository';
-import handleErrorResponse from '../../helpers/errorHandler';
+import handleErrorResponse from '../helpers/errorHandler';
 
 declare module 'express' {
   interface Request {

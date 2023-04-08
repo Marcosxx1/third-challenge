@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { json } from 'body-parser';
-import userRouter from './routes/userRoutes';
-import carRouter from './routes/carRoutes';
-import reservationRouter from './routes/reservationRoutes';
+import userRouter from './api/routes/userRoutes';
+import carRouter from './api/routes/carRoutes';
+import reservationRouter from './api/routes/reservationRoutes';
 
 export const app = express();
 

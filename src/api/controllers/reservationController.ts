@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
+import User, { IUser } from '../schemas/IUser';
 import ReservationService from '../services/reservationService';
-import handleErrorResponse from '../../helpers/errorHandler';
+import handleErrorResponse from '../helpers/errorHandler';
 
 export default class ReservationController {
   private reservationService: ReservationService;
@@ -11,11 +12,24 @@ export default class ReservationController {
 
   createReservation = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { start_date, end_date, id_car } = req.body;
+      const email: string = req.body.email;
+      console.log(email);
 
-      const id_user = '64316e21fd4a246645581e57';
+      const user: IUser = await User.findOne({ email: email });
 
-      const reservation = await this.reservationService.createReservation(id_user, start_date, end_date, id_car);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const userId: string = user.id;
+
+      const reservation = await this.reservationService.createReservation(
+        userId,
+        req.body.start_date,
+        req.body.end_date,
+        req.body.id_car,
+      );
+
       res.status(201).json({ reservation });
     } catch (error) {
       handleErrorResponse(res, error);
