@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
-import User, { IUser } from '../schemas/IUser'; // Import the IUser interface
 import handleErrorResponse from '../../helpers/errorHandler';
 import UserService from '../services/userService';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; // Import the necessary libraries for authentication
 
 const userService = new UserService();
 
@@ -24,25 +21,20 @@ class UserController {
       const { name, cpf, birth, email, password, cep, qualified, patio, complement, neighborhood, locality, uf } =
         req.body;
 
-      const userExists = await User.findById(id);
-      if (!userExists) {
-        return handleErrorResponse(res, { message: 'User not found' }, 404);
-      }
-
-      userExists.name = name;
-      userExists.cpf = cpf;
-      userExists.birth = birth;
-      userExists.email = email;
-      userExists.password = password;
-      userExists.cep = cep;
-      userExists.qualified = qualified;
-      userExists.patio = patio;
-      userExists.complement = complement;
-      userExists.neighborhood = neighborhood;
-      userExists.locality = locality;
-      userExists.uf = uf;
-
-      const updatedUser = await userExists.save();
+      const updatedUser = await userService.updateUser(id, {
+        name,
+        cpf,
+        birth,
+        email,
+        password,
+        cep,
+        qualified,
+        patio,
+        complement,
+        neighborhood,
+        locality,
+        uf,
+      });
 
       return res.status(200).json(updatedUser);
     } catch (error) {
@@ -54,12 +46,7 @@ class UserController {
     try {
       const { id } = req.params;
 
-      const userExists = await User.findById(id);
-      if (!userExists) {
-        return handleErrorResponse(res, { message: 'User not found' }, 404);
-      }
-
-      await userExists.deleteOne();
+      await userService.deleteUser(id);
 
       return res.status(204).send();
     } catch (error) {
@@ -71,10 +58,7 @@ class UserController {
     try {
       const { id } = req.params;
 
-      const user = await User.findById(id);
-      if (!user) {
-        return handleErrorResponse(res, { message: 'User not found' }, 404);
-      }
+      const user = await userService.getUserById(id);
 
       return res.status(200).json(user);
     } catch (error) {
@@ -84,31 +68,9 @@ class UserController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const users = await User.find();
+      const users = await userService.getAllUsers();
+
       return res.status(200).json(users);
-    } catch (error) {
-      return handleErrorResponse(res, error);
-    }
-  }
-
-  async authenticate(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email });
-
-      if (!user) {
-        return res.status(401).json({ error: 'Authentication failed. User not found.' });
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordValid) {
-        return res.status(401).json({ error: 'Authentication failed. Invalid password.' });
-      }
-
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY ?? 'defaultSecret', { expiresIn: '1h' });
-
-      return res.status(200).json({ user, token });
     } catch (error) {
       return handleErrorResponse(res, error);
     }

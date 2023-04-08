@@ -23,7 +23,6 @@ export const validateID = (schemaName: string) => async (req: Request, res: Resp
       return res.status(400).json({ error: 'Invalid schema name' });
     }
 
-    // eslint-disable-next-line prettier/prettier
     const document = await model.findById(id) as mongoose.Document<any, any, any> | null;
 
     if (!document) {
@@ -32,7 +31,6 @@ export const validateID = (schemaName: string) => async (req: Request, res: Resp
 
     next();
   } catch (err) {
-    // Handle any errors that occur during database query
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

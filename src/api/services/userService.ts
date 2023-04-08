@@ -11,13 +11,23 @@ interface CreateUserInput {
   password: string;
   cep: string;
   qualified: boolean;
+  [key: string]: any;
 }
+
+const checkRequiredFields = (value: any): void => {
+  const requiredFields = ['name', 'cpf', 'birth', 'email', 'password', 'cep', 'qualified'];
+  const missingFields = requiredFields.filter((field) => !value[field]);
+  if (missingFields.length > 0) {
+    throw { message: `Required fields are missing: ${missingFields.join(', ')}`, status: 400 };
+  }
+};
 
 class UserService {
   private createUserSchema: Joi.ObjectSchema<CreateUserInput>;
 
   constructor() {
     this.createUserSchema = Joi.object({
+      //move this to helpers or utils
       name: Joi.string().required(),
       cpf: Joi.string()
         .pattern(/^\d{3}.\d{3}.\d{3}-\d{2}$/)
@@ -34,9 +44,12 @@ class UserService {
 
   async createUser(userData: CreateUserInput): Promise<IUser> {
     const { error, value } = this.createUserSchema.validate(userData, { abortEarly: false });
+
+    checkRequiredFields(value);
     if (error) {
       throw { message: 'Invalid input', errors: error.details };
     }
+
     const { name, cpf, birth, email, password, cep, qualified } = value;
 
     const userExists = await UserRepository.findOne({ $or: [{ cpf }, { email }] });
@@ -69,6 +82,7 @@ class UserService {
   async updateUser(id: string, userData: IUser): Promise<IUser> {
     const { name, cpf, birth, email, password, cep, qualified, patio, complement, neighborhood, locality, uf } =
       userData;
+    checkRequiredFields(userData);
 
     const userExists = await UserRepository.findById(id);
     if (!userExists) {

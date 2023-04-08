@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+
 import { createCar, listCars, removeCar, updateCar, getCarById } from '../services/carServices';
 import handleErrorResponse from '../../helpers/errorHandler';
 
@@ -9,7 +10,7 @@ export const createCarController = async (req: Request, res: Response) => {
     const car = await createCar(carData);
     res.status(201).json(car);
   } catch (error) {
-    handleErrorResponse(res, error, 400);
+    handleErrorResponse(res, error);
   }
 };
 

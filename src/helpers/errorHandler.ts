@@ -3,9 +3,8 @@ import { Response } from 'express';
 const handleErrorResponse = (
   res: Response<any, Record<string, any>>,
   error: any,
-  status = 500, // Set default value to 500
 ): Response<any, Record<string, any>> => {
-  const { message, details } = error;
+  const { message, errors, status = 500 } = error;
 
   console.error(error);
 
@@ -14,9 +13,12 @@ const handleErrorResponse = (
       message: message || 'Internal Server Error',
     },
   };
-  if (details) {
-    errorResponse.error.details = details;
+  if (errors) {
+    errorResponse.error.details = errors;
   }
+
+  //const specificErrorMessage = errors && errors[0] && errors[0].message;
+
   return res.status(status).json(errorResponse);
 };
 
