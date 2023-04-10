@@ -10,23 +10,64 @@ class CarRepository {
   async listCars(
     limit: number,
     offset: number,
-    queryParams: { model?: string; color?: string; year?: number; value_per_day?: number; accessories?: string[] },
-  ): Promise<{ cars: ICar[]; total: number; limit: number; offset: number }> {
-    const { model, color, year, value_per_day, accessories } = queryParams;
-
+    model?: string,
+    color?: string,
+    year?: number,
+    value_per_day?: number,
+    accessories?: string[],
+  ): Promise<any> {
     const query: any = {};
-    if (model) query.model = model;
-    if (color) query.color = color;
-    if (year) query.year = year;
-    if (value_per_day) query.value_per_day = value_per_day;
-    if (accessories) query.accessories = { $in: accessories };
 
-    const total = await Car.countDocuments(query);
+    if (model) {
+      query.model = { $regex: new RegExp(model, 'i') };
+    }
+    if (color) {
+      query.color = { $regex: new RegExp(color, 'i') };
+    }
+    if (year) {
+      query.year = year;
+    }
+    if (value_per_day) {
+      query.value_per_day = value_per_day;
+    }
+    if (accessories) {
+      query.accessories = { $in: accessories };
+    }
 
-    const cars = await Car.find(query).skip(offset).limit(limit).exec();
-    console.log('carRepository  limit:', limit, 'offset: ', offset);
+    const pageSize = limit;
+    const skip = (offset - 1) * pageSize;
 
-    return { cars, total, limit, offset };
+    const cars = await Car.find(query).skip(skip).limit(pageSize);
+    return cars;
+  }
+
+  async getTotalCarCount(
+    model?: string,
+    color?: string,
+    year?: number,
+    value_per_day?: number,
+    accessories?: string[],
+  ): Promise<number> {
+    const query: any = {};
+
+    if (model) {
+      query.model = { $regex: new RegExp(model, 'i') };
+    }
+    if (color) {
+      query.color = { $regex: new RegExp(color, 'i') };
+    }
+    if (year) {
+      query.year = year;
+    }
+    if (value_per_day) {
+      query.value_per_day = value_per_day;
+    }
+    if (accessories) {
+      query.accessories = { $in: accessories };
+    }
+
+    const totalCount = await Car.countDocuments(query);
+    return totalCount;
   }
 
   async removeCar(id: string): Promise<void> {
