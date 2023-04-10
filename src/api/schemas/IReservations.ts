@@ -3,7 +3,7 @@ import { ICar } from './ICar';
 import { IUser } from './IUser'; //?
 
 export interface IReservation extends Document {
-  id_user: IUser['_id'];
+  id_user: mongoose.Schema.Types.ObjectId;
   start_date: Date;
   end_date: Date;
   id_car: ICar['_id'];

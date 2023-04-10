@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import User, { IUser } from '../schemas/IUser';
+import User, { IUserWithId } from '../schemas/IUser';
 import ReservationService from '../services/reservationService';
 import handleErrorResponse from '../helpers/errorHandler';
 
@@ -13,18 +13,15 @@ export default class ReservationController {
   createReservation = async (req: Request, res: Response): Promise<void> => {
     try {
       const email: string = req.body.email;
-      console.log(email);
 
-      const user: IUser = await User.findOne({ email: email });
+      const user: IUserWithId | null = await User.findOne({ email: email });
 
       if (!user) {
         throw new Error('User not found');
       }
 
-      const userId: string = user.id;
-
       const reservation = await this.reservationService.createReservation(
-        userId,
+        user._id.toString(),
         req.body.start_date,
         req.body.end_date,
         req.body.id_car,
@@ -75,8 +72,7 @@ export default class ReservationController {
       const { id } = req.params;
       const start_date = req.body.start_date;
       const end_date = req.body.end_date;
-      const id_car = req.body.id_car;
-      const reservation = await this.reservationService.updateReservation(id, start_date, end_date, id_car);
+      const reservation = await this.reservationService.updateReservation(id, start_date, end_date);
       if (reservation) {
         res.status(200).json({ reservation });
       } else {

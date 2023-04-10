@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import Joi from 'joi';
 import { cpf } from 'cpf-cnpj-validator';
 
@@ -16,7 +16,9 @@ export interface IUser {
   locality: string;
   uf: string;
 }
-
+export interface IUserWithId extends IUser {
+  _id: mongoose.Types.ObjectId;
+}
 const UserSchema: Schema = new Schema<IUser>(
   {
     name: {

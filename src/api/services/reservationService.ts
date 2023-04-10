@@ -41,9 +41,7 @@ export default class ReservationService {
         const newStartDate = new Date(start_date);
         const newEndDate = new Date(end_date);
         const currentDate = new Date();
-        const car: ICar = await Car.findOne({ _id: reservation.id_car });
-
-
+        const car: ICar | null = await Car.findOne({ _id: reservation.id_car });
         if (!car) {
           throw new Error('Car not found');
         }
