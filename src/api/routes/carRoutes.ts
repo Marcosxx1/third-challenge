@@ -18,6 +18,6 @@ carRouter.delete('/car/:id', validateID('car'), removeCarController);
 carRouter.get('/car/:id', validateID('car'), getCarByIdController);
 carRouter.get('/car', listCarsController);
 
-carRouter.put('/car/:carId/accessories/:accessoryId', validateID('car'), updateAccessoryController);
+carRouter.patch('/car/:carId/accessories/:accessoryId', validateID('car'), updateAccessoryController);
 
 export default carRouter;
