@@ -27,13 +27,27 @@ export const listCarsController = async (req: Request, res: Response) => {
       parsedOffset = 1;
     }
 
-    const cars = await CarService.listCars(parsedLimit, parsedOffset, model, color, year, value_per_day, accessories);
+    const cars = await CarService.listCars(
+      parsedLimit,
+      parsedOffset,
+      model as string,
+      color as string,
+      year as unknown as number,
+      value_per_day as unknown as number,
+      accessories as string[],
+    );
 
     if (cars.length === 0) {
       throw { message: 'No cars found with the given search parameters', status: 400 };
     }
 
-    const totalCount = await CarService.getTotalCarCount(model, color, year, value_per_day, accessories);
+    const totalCount = await CarService.getTotalCarCount(
+      model as string,
+      color as string,
+      year as unknown as number,
+      value_per_day as unknown as number,
+      accessories as string[],
+    );
     const totalPages = Math.ceil(totalCount / parsedLimit);
 
     res.json({ cars, totalCount, totalPages });

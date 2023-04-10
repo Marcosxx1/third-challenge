@@ -21,9 +21,6 @@ export const validateID = (schemaName: string) => async (req: Request, res: Resp
     } else {
       return res.status(400).json({ error: 'Invalid schema name' });
     }
-
-    const document = await model.findById(carId);
-
     next();
   } catch (err) {
     return res.status(500).json({ error: 'Internal Server Error' });

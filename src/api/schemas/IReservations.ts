@@ -1,7 +1,6 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import { ICar } from './ICar';
 import { IUser } from './IUser'; //?
-import { any } from 'joi';
 
 export interface IReservation extends Document {
   id_user: IUser['_id'];

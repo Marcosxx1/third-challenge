@@ -2,9 +2,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 import Joi from 'joi';
 import { cpf } from 'cpf-cnpj-validator';
 import axios from 'axios';
-import moment from 'moment';
 
-interface IUser extends Document {
+export interface IUser extends Document {
   name: string;
   cpf: string;
   birth: Date;
@@ -19,7 +18,7 @@ interface IUser extends Document {
   uf: string;
 }
 
-const UserSchema: Schema<IUser> = new Schema<IUser>(
+const UserSchema: Schema = new Schema<IUser>(
   {
     name: {
       type: String,
