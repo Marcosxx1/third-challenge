@@ -1,5 +1,4 @@
 import User, { IUser } from '../schemas/IUser';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 class UserRepository {
@@ -37,25 +36,10 @@ class UserRepository {
 
   async findAll(): Promise<IUser[]> {
     const users = await User.find();
+    if (users.length === 0) {
+      throw new Error('No users found');
+    }
     return users;
-  }
-
-  async authenticate(email: string, password: string): Promise<IUser | null> {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return null;
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return null;
-    }
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY ?? 'defaultSecret', { expiresIn: '1h' });
-
-    return token;
   }
 }
 

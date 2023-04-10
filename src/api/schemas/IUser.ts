@@ -1,9 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import Joi from 'joi';
 import { cpf } from 'cpf-cnpj-validator';
-import axios from 'axios';
 
-export interface IUser extends Document {
+export interface IUser {
   name: string;
   cpf: string;
   birth: Date;
@@ -134,15 +133,5 @@ const UserSchema: Schema = new Schema<IUser>(
   },
   { timestamps: true },
 );
-
-UserSchema.pre<IUser>('save', async function () {
-  const cep = this.cep.replace('-', '');
-  const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`);
-  this.patio = data.logradouro;
-  this.complement = data.complemento;
-  this.neighborhood = data.bairro;
-  this.locality = data.localidade;
-  this.uf = data.uf;
-});
 
 export default mongoose.model<IUser>('User', UserSchema);

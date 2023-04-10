@@ -58,13 +58,13 @@ class UserService {
       throw { message: `User with this ${field} already exists` };
     }
 
-    const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`); //?
+    const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`);
     const { logradouro: patio, complemento: complement, bairro: neighborhood, localidade: locality, uf } = data;
 
     const user = await UserRepository.create({
       name,
       cpf,
-      birth,
+      birth: new Date(birth), // Parse birth value into Date object
       email,
       password,
       cep,
@@ -103,7 +103,9 @@ class UserService {
     userExists.uf = uf;
 
     const updatedUser = await UserRepository.update(id, userExists);
-
+    if (updatedUser === null) {
+      throw { message: 'Failed to update user' };
+    }
     return updatedUser;
   }
 

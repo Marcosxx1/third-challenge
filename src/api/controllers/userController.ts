@@ -7,9 +7,8 @@ const userService = new UserService();
 class UserController {
   async create(req: Request, res: Response) {
     try {
-      const { user, token } = await userService.createUser(req.body);
-
-      return res.status(201).json({ user, token });
+      const user = await userService.createUser(req.body);
+      return res.status(201).json(user);
     } catch (error: any) {
       return handleErrorResponse(res, error);
     }

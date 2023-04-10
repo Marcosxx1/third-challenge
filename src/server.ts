@@ -1,4 +1,4 @@
-import { app } from './app';
+import app from './app';
 import mongoose, { ConnectOptions } from 'mongoose';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
