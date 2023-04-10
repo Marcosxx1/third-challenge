@@ -52,7 +52,7 @@ Afiter tws -w we need to start the server, navigate to third-challenge/dist and 
 
 
 We'll be using postman to accessing the routes, and mongoDB to data persistency
-[Here is the link to postman documentation fo the api](https://documenter.getpostman.com/view/25704905/2s93XsXkcn), a config.env will be avaliable for the evaluation of this callenge, but it will be removed later after it.
+[Here is the link to the postman documentation for the api](https://documenter.getpostman.com/view/25704905/2s93XsXkcn), a config.env will be avaliable for the evaluation of this callenge, but it will be removed later after it.
 
 
 ## User routes
