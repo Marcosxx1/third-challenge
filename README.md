@@ -107,6 +107,23 @@ This endpoints manage the reservation, to create a reservation the user **must**
 - `DELETE /reserve/:id` - removes an existing reservation with the specified id
 - `GET /reserve/:id` - retrieves the details of an existing reservation with the specified id
 - `GET /reserve` - lists all existing reservations
+
+
+In to create a reserve the user must be authenticated
+after authentication the user will recive a token, copy it:
+ <li>1</li>
+  <div align="center">
+<img src="https://user-images.githubusercontent.com/37447545/231020486-e424e732-5e70-4b67-a72c-21b0124f2c09.png" width="960px" />
+</div>
+ <br>
+
+And then follow this steps to be able to access the reservation routes:
+ <li>1</li>
+  <div align="center">
+<img src="https://user-images.githubusercontent.com/37447545/231020491-e72215db-03d6-4027-998a-cb4b36fd3b2b.png" width="960px" />
+</div>
+ <br>
+
 </details>
 
 The authController.passToken middleware is used to pass the JWT token for authenticated endpoints, and the validateID('reservation') middleware is used to validate the id parameter of the endpoints that require it.
