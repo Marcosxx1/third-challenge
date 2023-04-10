@@ -47,8 +47,12 @@ export const removeCarController = async (req: Request, res: Response) => {
     const id = req.params.id;
     await CarService.removeCar(id);
     res.sendStatus(204);
-  } catch (error) {
-    handleErrorResponse(res, error);
+  } catch (error: any) {
+    if (error.message === 'Car not found') {
+      return res.status(404).json({ error: { message: error.message } });
+    }
+
+    return handleErrorResponse(res, error);
   }
 };
 
@@ -80,5 +84,34 @@ export const getCarByIdController = async (req: Request, res: Response) => {
     }
   } catch (error) {
     handleErrorResponse(res, error);
+  }
+};
+export const updateAccessoryController = async (req: Request, res: Response) => {
+  try {
+    const carId = req.params.carId;
+    const accessoryId = req.params.accessoryId;
+    const accessoryData = req.body;
+
+    if (!accessoryData.description) {
+      return res.status(400).json({ error: 'Description field is required' });
+    }
+
+    const car = await CarService.getCarById(carId);
+    if (!car) {
+      return res.status(404).json({ error: 'Car not found' });
+    }
+
+    const accessory = car.accessories.find((accessory) => accessory._id.toString() === accessoryId);
+    if (!accessory) {
+      return res.status(404).json({ error: 'Accessory not found' });
+    }
+
+    accessory.description = accessoryData.description;
+
+    await car.save();
+
+    return res.json(car);
+  } catch (error) {
+    return handleErrorResponse(res, error);
   }
 };

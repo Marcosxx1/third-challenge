@@ -5,11 +5,10 @@ import UserModel from '../schemas/IUser';
 import ReservationModel from '../schemas/IReservations';
 
 export const validateID = (schemaName: string) => async (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: 'Invalid ID' });
-  }
+  const carId = req.params.carId;
+  const accessoryId = req.params.accessoryId;
+  console.log(req.params);
+  console.log(accessoryId);
 
   try {
     let model;
@@ -22,12 +21,8 @@ export const validateID = (schemaName: string) => async (req: Request, res: Resp
     } else {
       return res.status(400).json({ error: 'Invalid schema name' });
     }
-    //?
-    const document = (await model.findById(id)) as mongoose.Document<any, any, any> | null;
 
-    if (!document) {
-      return res.status(404).json({ error: 'ID not found' });
-    }
+    const document = await model.findById(carId);
 
     next();
   } catch (err) {

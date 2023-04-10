@@ -34,13 +34,11 @@ export default class CarService {
     accessories?: string[],
   ): Promise<any> {
     if (model === undefined || model === '') {
-      const cars: ICar[] = await carRepository.listCars(limit, offset, model, color, year, value_per_day, accessories);
-      throw new Error('Provide valid search parameters');
+      return await carRepository.listCars(limit, offset, undefined, color, year, value_per_day, accessories);
     } else {
       return await carRepository.listCars(limit, offset, model, color, year, value_per_day, accessories);
     }
   }
-
   static async getTotalCarCount(
     model?: string,
     color?: string,
@@ -51,7 +49,10 @@ export default class CarService {
     return await carRepository.getTotalCarCount(model, color, year, value_per_day, accessories);
   }
   static async removeCar(id: string): Promise<void> {
-    await carRepository.removeCar(id);
+    const car = await Car.findByIdAndRemove(id);
+    if (!car) {
+      throw new Error('Car not found');
+    }
   }
 
   static async updateCar(

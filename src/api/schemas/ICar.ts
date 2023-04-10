@@ -11,6 +11,13 @@ export interface ICar extends Document {
   offset: number;
 }
 export interface IAccessory {
+  //colocar os tipos corretos
+  _id: string;
+  model: any;
+  color: any;
+  year: any;
+  value_per_day: any;
+  number_of_passengers: any;
   description: string;
 }
 const VehicleSchema: Schema = new Schema<ICar>({

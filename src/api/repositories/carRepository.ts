@@ -71,10 +71,7 @@ class CarRepository {
   }
 
   async removeCar(id: string): Promise<void> {
-    const car = await Car.findByIdAndRemove(id);
-    if (!car) {
-      throw new Error('Car not found');
-    }
+    await Car.findByIdAndRemove(id);
   }
 
   async updateCar(id: string, carData: any): Promise<ICar | null> {
