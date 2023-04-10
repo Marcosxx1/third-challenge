@@ -1,21 +1,133 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "title": "Third Challenge, Marcos",
-    "description": "Car rent application",
-    "version": "1.0.0"
-  },
-  "basePath": "/api",
-  "schemes": [
-    "http",
-    "https"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "paths": {},
-  "definitions": {}
+  "paths": {
+    "/car": {
+      "post": {
+        "summary": "Create a new car",
+        "description": "Endpoint to create a new car",
+        "operationId": "createCar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "description": "The model of the car"
+                  },
+                  "color": {
+                    "type": "string",
+                    "description": "The color of the car"
+                  },
+                  "year": {
+                    "type": "string",
+                    "pattern": "^(19|20)\\d{2}$",
+                    "description": "The fabrication year of the car. Must be between 1950 and 2023."
+                  },
+                  "value_per_day": {
+                    "type": "number",
+                    "description": "The value per day to rent the car"
+                  },
+                  "accessories": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "description": {
+                          "type": "string",
+                          "description": "The description of the accessory"
+                        }
+                      },
+                      "required": [
+                        "description"
+                      ],
+                      "example": [
+                        {
+                          "description": "air conditioner"
+                        },
+                        {
+                          "description": "4x4 traction"
+                        }
+                      ]
+                    },
+                    "minItems": 1,
+                    "description": "An array of accessories for the car. Must contain at least one accessory."
+                  },
+                  "number_of_passengers": {
+                    "type": "integer",
+                    "description": "The number of passengers the car can accommodate"
+                  }
+                },
+                "required": [
+                  "model",
+                  "color",
+                  "year",
+                  "value_per_day",
+                  "accessories",
+                  "number_of_passengers"
+                ],
+                "example": {
+                  "model": "GM S10 2.8",
+                  "color": "White",
+                  "year": "2021",
+                  "value_per_day": 50,
+                  "accessories": [
+                    {
+                      "description": "air conditioner"
+                    },
+                    {
+                      "description": "4x4 traction"
+                    }
+                  ],
+                  "number_of_passengers": 5
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Car created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201,
+                      "description": "Status code indicating success"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid fields in the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400,
+                      "description": "Status code indicating a bad request"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid fields in the request",
+                      "description": "Error message describing the issue with the request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import Reservation, { IReservation } from '../schemas/IReservations';
+import Car, { ICar } from '../schemas/ICar';
 
 export default class ReservationService {
   async createReservation(
@@ -28,21 +29,60 @@ export default class ReservationService {
     return Reservation.findById(id);
   }
 
-  async updateReservationById(id: string, update: any) {
-    if (update.id_car && update.id_car !== id) {
-      throw new Error('Cannot update reservation with different car ID');
-    }
+  updateReservation = async (id: string, start_date: string, end_date: string): Promise<IReservation | null> => {
+    try {
+      const reservation = await Reservation.findById(id);
 
-    const existingReservation = await Reservation.findOne({
-      id_car: id,
-      start_date: { $gt: new Date() },
-    });
-    if (existingReservation) {
-      throw new Error('Cannot update reservation, car already has a reservation for the next day');
-    }
+      if (reservation) {
+        const oldStartDate = reservation.start_date;
+        const oldEndDate = reservation.end_date;
+        const oldDaysDifference = Math.floor((oldEndDate.getTime() - oldStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    return Reservation.findByIdAndUpdate(id, update, { new: true });
-  }
+        const newStartDate = new Date(start_date);
+        const newEndDate = new Date(end_date);
+        const currentDate = new Date();
+        const car: ICar = await Car.findOne({ _id: reservation.id_car });
+
+
+        if (!car) {
+          throw new Error('Car not found');
+        }
+
+        console.log(currentDate);
+        console.log(newEndDate);
+
+        if (newStartDate < reservation.start_date) {
+          throw new Error('New date must be greater than the initial one.');
+        }
+
+        if (newEndDate < newStartDate) {
+          throw new Error('The end date cannot be before the start date.');
+        }
+
+        const daysDifference = Math.floor((newEndDate.getTime() - newStartDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        const fixedValue = car.value_per_day;
+        let valorFinal = fixedValue * daysDifference;
+
+        if (daysDifference > oldDaysDifference) {
+          const daysAdded = daysDifference - oldDaysDifference;
+          valorFinal += fixedValue * daysAdded;
+        }
+
+        reservation.start_date = newStartDate;
+        reservation.end_date = newEndDate;
+        reservation.final_value = valorFinal;
+
+        await Reservation.updateOne({ _id: id }, { $set: reservation });
+
+        return reservation;
+      }
+
+      return null;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
 
   async removeReservationById(id: string) {
     const reservation = await Reservation.findById(id);

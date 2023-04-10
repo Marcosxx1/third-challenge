@@ -1,7 +1,6 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import UserController from '../controllers/userController';
 import { validateID } from '../helpers/validateID';
-import AuthController from '../controllers/authController';
 
 const userRouter = Router();
 

@@ -22,8 +22,8 @@ export const validateID = (schemaName: string) => async (req: Request, res: Resp
     } else {
       return res.status(400).json({ error: 'Invalid schema name' });
     }
-
-    const document = await model.findById(id) as mongoose.Document<any, any, any> | null;
+    //?
+    const document = (await model.findById(id)) as mongoose.Document<any, any, any> | null;
 
     if (!document) {
       return res.status(404).json({ error: 'ID not found' });

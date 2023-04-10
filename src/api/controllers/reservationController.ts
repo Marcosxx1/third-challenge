@@ -73,8 +73,10 @@ export default class ReservationController {
   updateReservationById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const update = req.body;
-      const reservation = await this.reservationService.updateReservationById(id, update);
+      const start_date = req.body.start_date;
+      const end_date = req.body.end_date;
+      const id_car = req.body.id_car;
+      const reservation = await this.reservationService.updateReservation(id, start_date, end_date, id_car);
       if (reservation) {
         res.status(200).json({ reservation });
       } else {

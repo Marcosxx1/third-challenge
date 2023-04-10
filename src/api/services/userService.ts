@@ -58,7 +58,7 @@ class UserService {
       throw { message: `User with this ${field} already exists` };
     }
 
-    const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`);
+    const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json`); //?
     const { logradouro: patio, complemento: complement, bairro: neighborhood, localidade: locality, uf } = data;
 
     const user = await UserRepository.create({

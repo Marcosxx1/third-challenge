@@ -1,4 +1,5 @@
 import Car, { ICar, IAccessory } from '../schemas/ICar';
+import carRepository from '../repositories/carRepository';
 
 export const createCar = async (carData: {
   model: string;
@@ -30,17 +31,7 @@ export const listCars = async (
 ): Promise<{ cars: ICar[]; total: number; limit: number; offset: number }> => {
   const { model, color, year, value_per_day, accessories } = queryParams;
 
-  const query: any = {};
-  if (model) query.model = model;
-  if (color) query.color = color;
-  if (year) query.year = year;
-  if (value_per_day) query.value_per_day = value_per_day;
-  if (accessories) query.accessories = { $in: accessories };
-
-  const total = await Car.countDocuments(query);
-
-  const cars = await Car.find(query).skip(offset).limit(limit).exec();
-  return { cars, total, limit, offset };
+  return await carRepository.listCars(limit, offset, queryParams);
 };
 
 export const removeCar = async (id: string): Promise<void> => {

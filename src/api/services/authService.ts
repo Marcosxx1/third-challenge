@@ -39,17 +39,17 @@ class AuthService {
   authenticate(req: Request, res: Response, next: NextFunction): void {
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
-      handleErrorResponse(res, { message: 'Unauthorized' }, 401);
+      handleErrorResponse(res, 401);
       return;
     }
 
     const payload = this.validateJwtToken(token);
     if (!payload) {
-      handleErrorResponse(res, { message: 'Invalid token' }, 401);
+      handleErrorResponse(res, 401);
       return;
     }
 
-    res.locals.user = payload; // Store the payload object in res.locals.user
+    res.locals.user = payload;
     next();
   }
 }

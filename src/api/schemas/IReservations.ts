@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import { ICar } from './ICar';
-import { IUser } from './IUser';
+import { IUser } from './IUser'; //?
+import { any } from 'joi';
 
 export interface IReservation extends Document {
   id_user: IUser['_id'];
@@ -78,6 +79,31 @@ ReservationSchema.pre<IReservation>('save', async function () {
   if (existingReservation) {
     const error = new CustomError('There is already a reservation for this user in the same period', 400);
     throw error;
+  }
+});
+
+ReservationSchema.pre<IReservation>('save', async function (next) {
+  if (this.start_date >= this.end_date) {
+    const error = new CustomError('start_date must be before end_date', 400);
+    return next(error);
+  }
+
+  const timeDifference = Math.abs(this.start_date.getTime() - this.end_date.getTime());
+  const oneDay = 24 * 60 * 60 * 1000;
+  const totalDays = Math.ceil(timeDifference / oneDay);
+
+  try {
+    const car = await Car.findById(this.id_car);
+    if (!car) {
+      const error = new CustomError('Car not found', 400);
+      return next(error);
+    }
+
+    const valuePerDay = car.value_per_day;
+    this.final_value = totalDays * valuePerDay;
+    next();
+  } catch (err: any) {
+    next(err);
   }
 });
 

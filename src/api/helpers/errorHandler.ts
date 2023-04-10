@@ -8,18 +8,24 @@ const handleErrorResponse = (
 
   console.error(error);
 
-  const errorResponse: any = {
-    error: {
-      message: message || 'Internal Server Error',
-    },
-  };
-  if (errors) {
-    errorResponse.error.details = errors;
+  let errorMessage = 'Validation failed: ';
+
+  const fieldName = errors && Object.keys(errors)[0];
+  const fieldError = fieldName && errors[fieldName];
+
+  if (fieldName && fieldError && fieldError.message) {
+    errorMessage += `${fieldName}: ${fieldError.message}`;
+  } else {
+    errorMessage += message;
   }
 
-  //const specificErrorMessage = errors && errors[0] && errors[0].message;
+  const errorResponse: any = {
+    error: {
+      message: errorMessage,
+    },
+  };
 
-  return res.status(status).json(errorResponse);
+  return res.status(400).json(errorResponse);
 };
 
 export default handleErrorResponse;
