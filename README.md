@@ -120,7 +120,7 @@ after authentication the user will recive a token, copy it:
 And then follow this steps to be able to access the reservation routes:
  <li>1</li>
   <div align="center">
-<img src="https://user-images.githubusercontent.com/37447545/231020491-e72215db-03d6-4027-998a-cb4b36fd3b2b.png" width="960px" />
+<img src="https://user-images.githubusercontent.com/37447545/231021845-d249755f-9a62-4fb9-9e8e-f9ff7e7e1e42.png" width="960px" />
 </div>
  <br>
 
